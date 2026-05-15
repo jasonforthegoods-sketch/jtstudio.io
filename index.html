@@ -588,27 +588,32 @@ async function submitForm(){
   btn.disabled=true;
   btn.style.opacity='.5';
 
+  const data=new FormData();
+  data.append('subject', subj);
+  data.append('message', msg);
+  data.append('contact', cont);
+  data.append('name', name);
+  data.append('_subject', '[JT Studio] 新咨询: '+subj);
+
   try{
     const res=await fetch('https://formspree.io/f/mrejwjkv',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body:JSON.stringify({
-        subject: subj,
-        message: msg,
-        contact: cont,
-        name: name,
-        _subject: '[JT Studio] 新咨询: '+subj,
-      })
+      headers:{'Accept':'application/json'},
+      body:data
     });
-    if(res.ok){
+    const json=await res.json();
+    if(res.ok && !json.errors){
       document.getElementById('formArea').style.display='none';
       document.getElementById('formSuccess').style.display='block';
     } else {
-      const msgs={zh:'提交失败，请直接通过Telegram或邮件联系我们。',en:'Submission failed. Please contact us directly via Telegram or Email.',kr:'제출 실패. 텔레그램 또는 이메일로 직접 연락해 주세요.'};
+      const errMsg=json.errors?json.errors.map(e=>e.message).join(', '):'Unknown error';
+      console.error('Formspree error:',errMsg);
+      const msgs={zh:'提交失败，请直接通过Telegram或邮件联系我们。',en:'Submission failed. Please contact us via Telegram or Email.',kr:'제출 실패. 텔레그램 또는 이메일로 직접 연락해 주세요.'};
       alert(msgs[lang]);
       btn.disabled=false;btn.style.opacity='1';
     }
   }catch(e){
+    console.error('Network error:',e);
     const msgs={zh:'网络错误，请直接通过Telegram或邮件联系我们。',en:'Network error. Please contact us via Telegram or Email.',kr:'네트워크 오류. 직접 연락해 주세요.'};
     alert(msgs[lang]);
     btn.disabled=false;btn.style.opacity='1';
