@@ -574,16 +574,45 @@ function goHome(){
   window.scrollTo(0,0);
 }
 
-function submitForm(){
+async function submitForm(){
   const subj=document.getElementById('f-subject').value.trim();
+  const msg=document.getElementById('f-message').value.trim();
   const cont=document.getElementById('f-contact').value.trim();
+  const name=document.getElementById('f-name').value.trim();
   const lang=curLang();
   if(!subj||!cont){
     const msgs={zh:'请填写咨询标题和联系方式。',en:'Please fill in Subject and Contact.',kr:'제목과 연락처를 입력해 주세요.'};
     alert(msgs[lang]);return;
   }
-  document.getElementById('formArea').style.display='none';
-  document.getElementById('formSuccess').style.display='block';
+  const btn=document.querySelector('.submit-btn');
+  btn.disabled=true;
+  btn.style.opacity='.5';
+
+  try{
+    const res=await fetch('https://formspree.io/f/mrejwjkv',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({
+        subject: subj,
+        message: msg,
+        contact: cont,
+        name: name,
+        _subject: '[JT Studio] 新咨询: '+subj,
+      })
+    });
+    if(res.ok){
+      document.getElementById('formArea').style.display='none';
+      document.getElementById('formSuccess').style.display='block';
+    } else {
+      const msgs={zh:'提交失败，请直接通过Telegram或邮件联系我们。',en:'Submission failed. Please contact us directly via Telegram or Email.',kr:'제출 실패. 텔레그램 또는 이메일로 직접 연락해 주세요.'};
+      alert(msgs[lang]);
+      btn.disabled=false;btn.style.opacity='1';
+    }
+  }catch(e){
+    const msgs={zh:'网络错误，请直接通过Telegram或邮件联系我们。',en:'Network error. Please contact us via Telegram or Email.',kr:'네트워크 오류. 직접 연락해 주세요.'};
+    alert(msgs[lang]);
+    btn.disabled=false;btn.style.opacity='1';
+  }
 }
 
 /* ═══ LANG SWITCH — simple + JT FORMAT EFFECT ═══ */
