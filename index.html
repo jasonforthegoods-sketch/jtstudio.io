@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JT STUDIO UNLIMITED</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600&family=Share+Tech+Mono&family=Noto+Sans+SC:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:#000;color:#fff;font-family:'Rajdhani',sans-serif;overflow-x:hidden;min-height:100vh}
+:root{--g:#FFC800;--g2:#C8960A;--c:#00F0FF;--dk:#03030A}
+
+
+canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+.vig{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 38%,transparent 18%,rgba(0,0,0,.85) 100%);pointer-events:none;z-index:1}
+
+
+
+
+/* ══ TOPBAR ══ */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:800;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0 40px;height:56px;
+  background:rgba(0,0,0,.92);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid rgba(255,200,0,.15);
+}
+
+
+.tb-left{display:flex;align-items:center;gap:20px}
+.back-btn{display:none;align-items:center;gap:7px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.2em;color:rgba(255,200,0,.7);cursor:pointer;transition:color .2s;background:none;border:none;padding:0}
+.back-btn:hover{color:var(--g)}
+.back-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tb-logo{
+  font-family:'Orbitron',monospace;font-size:14px;font-weight:900;
+  letter-spacing:.22em;color:var(--g);cursor:pointer;
+  transition:all .2s;animation:flicker 12s ease-in-out infinite;
+  text-shadow:0 0 12px rgba(255,200,0,.35);
+}
+.tb-logo:hover{opacity:.7;text-shadow:0 0 20px rgba(255,200,0,.6)}
+.tb-sep{width:1px;height:20px;background:rgba(255,200,0,.18)}
+.tb-sub{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.28em;color:rgba(255,200,0,.5)}
+
+.tb-right{display:flex;align-items:center;gap:16px}
+
+/* ONLINE INDICATOR */
+.tb-online{display:flex;align-items:center;gap:7px;padding:5px 14px;border:1px solid rgba(0,240,255,.22);background:rgba(0,240,255,.04)}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--c);box-shadow:0 0 6px rgba(0,240,255,.8),0 0 12px rgba(0,240,255,.4);animation:pulse 2s ease-in-out infinite;flex-shrink:0}
+.tb-online span{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.18em;color:rgba(0,240,255,.9);font-weight:400}
+
+/* LANG SWITCHER — redesigned */
+.lang-sw{display:flex;align-items:center;gap:3px;padding:4px;background:rgba(255,200,0,.04);border:1px solid rgba(255,200,0,.2)}
+.lb{
+  padding:5px 14px;
+  font-family:'Orbitron',monospace;font-size:9px;letter-spacing:.16em;
+  background:transparent;border:none;
+  color:rgba(255,255,255,.55);
+  cursor:pointer;transition:all .25s;
+  position:relative;
+}
+.lb:hover{color:rgba(255,200,0,.85)}
+.lb.on{
+  background:var(--g);color:#000;font-weight:900;
+  box-shadow:0 0 8px rgba(255,200,0,.4),0 0 16px rgba(255,200,0,.15);
+}
+.lb-kr{font-family:'Noto Sans KR',sans-serif;font-size:10px;letter-spacing:.05em}
+
+/* ══ PAGES ══ */
+.page{position:relative;z-index:10;min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:100px 48px 80px}
+.page.active{display:flex}
+
+/* ══ HOME ══ */
+#home{text-align:center}
+.home-sys{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.45em;color:rgba(0,240,255,.45);margin-bottom:28px;display:flex;align-items:center;justify-content:center;gap:14px}
+.home-sys::before,.home-sys::after{content:'';width:30px;height:1px;background:rgba(0,240,255,.22)}
+
+.name-wrap{position:relative;display:inline-block;margin-bottom:4px}
+.home-jt{font-family:'Orbitron',monospace;font-size:clamp(44px,8vw,88px);font-weight:900;letter-spacing:.06em;color:var(--g);display:block;line-height:1;animation:flicker 14s ease-in-out infinite;text-shadow:0 0 40px rgba(255,200,0,.18)}
+.home-gl{position:absolute;inset:0;font-family:'Orbitron',monospace;font-size:clamp(44px,8vw,88px);font-weight:900;letter-spacing:.06em;color:var(--c);line-height:1;animation:glitch1 9s ease-in-out infinite;pointer-events:none}
+.home-gr{position:absolute;inset:0;font-family:'Orbitron',monospace;font-size:clamp(44px,8vw,88px);font-weight:900;letter-spacing:.06em;color:#FF003C;line-height:1;animation:glitch2 13s ease-in-out infinite 1.5s;pointer-events:none}
+.home-studio{font-family:'Orbitron',monospace;font-size:clamp(18px,3.2vw,36px);font-weight:400;letter-spacing:.42em;color:rgba(255,200,0,.5);display:block;margin-top:6px}
+.home-unlim{font-family:'Share Tech Mono',monospace;font-size:clamp(8px,1.1vw,11px);letter-spacing:.65em;color:rgba(0,240,255,.35);display:block;margin-top:12px}
+
+.home-div{display:flex;align-items:center;gap:14px;justify-content:center;margin:30px auto}
+.hdl{width:56px;height:1px;background:linear-gradient(to right,transparent,rgba(255,200,0,.3))}
+.hdd{width:5px;height:5px;background:var(--g);transform:rotate(45deg);box-shadow:0 0 6px rgba(255,200,0,.5)}
+.hdlr{background:linear-gradient(to left,transparent,rgba(255,200,0,.3))}
+
+.home-tagline{font-family:'Noto Sans SC',sans-serif;font-size:clamp(12px,1.6vw,15px);font-weight:300;letter-spacing:.4em;color:rgba(255,255,255,.4);margin-bottom:50px}
+.home-tagline .en-t,.home-tagline .kr-t{font-family:'Share Tech Mono',monospace;font-size:clamp(9px,1.2vw,12px);letter-spacing:.3em;color:rgba(255,255,255,.35)}
+.home-tagline .kr-t{font-family:'Noto Sans KR',sans-serif;font-size:clamp(11px,1.4vw,14px);letter-spacing:.25em}
+
+/* TRIGGERS */
+.svc-triggers{display:flex;gap:2px;max-width:820px;width:100%;margin:0 auto}
+.trig{flex:1;position:relative;padding:32px 18px;background:rgba(5,5,12,.75);border:1px solid rgba(255,200,0,.1);cursor:pointer;text-align:center;overflow:hidden;transition:border-color .4s,background .4s;display:flex;flex-direction:column;align-items:center;gap:10px}
+.trig::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--g),transparent);transform:scaleX(0);transition:transform .5s cubic-bezier(.77,0,.175,1)}
+.trig:hover::before{transform:scaleX(1)}
+.trig::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(255,200,0,.06) 0%,transparent 65%);opacity:0;transition:opacity .4s}
+.trig:hover::after{opacity:1}
+.trig:hover{border-color:rgba(255,200,0,.22);background:rgba(255,200,0,.014)}
+.trig-num{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.38em;color:rgba(0,240,255,.35);position:relative;z-index:2}
+.trig-icon{width:36px;height:36px;border:1px solid rgba(255,200,0,.2);display:flex;align-items:center;justify-content:center;position:relative;z-index:2;transition:border-color .3s,box-shadow .3s}
+.trig:hover .trig-icon{border-color:rgba(255,200,0,.55);box-shadow:0 0 12px rgba(255,200,0,.15),inset 0 0 10px rgba(255,200,0,.05)}
+.trig-icon svg{width:17px;height:17px;stroke:var(--g);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.trig-en{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:.1em;color:#fff;position:relative;z-index:2;line-height:1.3}
+.trig-zh{font-family:'Noto Sans SC',sans-serif;font-size:12px;font-weight:700;color:var(--g);letter-spacing:.2em;position:relative;z-index:2}
+.trig-kr{font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:700;color:var(--g);letter-spacing:.05em;position:relative;z-index:2}
+.trig-arr{display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.2em;color:rgba(255,200,0,.35);position:relative;z-index:2;transition:all .3s;margin-top:2px}
+.trig:hover .trig-arr{color:rgba(255,200,0,.75);gap:10px}
+.trig-aline{width:12px;height:1px;background:currentColor;transition:width .3s}
+.trig:hover .trig-aline{width:20px}
+
+/* CONTACT */
+.contact-row{display:flex;gap:12px;justify-content:center;margin-top:40px}
+.cbtn{display:flex;align-items:center;gap:8px;padding:11px 22px;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:.15em;cursor:pointer;border:none;transition:all .3s;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);text-decoration:none;position:relative;overflow:hidden}
+.cbtn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);transform:translateX(-100%);transition:transform .45s}
+.cbtn:hover::after{transform:translateX(100%)}
+.btn-tg{background:rgba(0,12,22,.95);border:1px solid rgba(0,240,255,.3);color:var(--c)}
+.btn-tg:hover{box-shadow:0 0 20px rgba(0,240,255,.25);border-color:var(--c)}
+.btn-mail{background:rgba(18,10,0,.95);border:1px solid rgba(255,200,0,.3);color:var(--g)}
+.btn-mail:hover{box-shadow:0 0 20px rgba(255,200,0,.25);border-color:var(--g)}
+.cbtn svg{width:14px;height:14px;fill:currentColor;flex-shrink:0}
+
+/* ══ SUB PAGE ══ */
+#sub{align-items:flex-start;padding:110px 48px 80px}
+.sub-inner{width:100%;max-width:760px;margin:0 auto}
+.sub-eyebrow{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.42em;color:rgba(0,240,255,.45);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.sub-eyebrow::before{content:'';width:16px;height:1px;background:rgba(0,240,255,.35)}
+.sub-title-en{font-family:'Orbitron',monospace;font-size:clamp(26px,5vw,52px);font-weight:900;letter-spacing:.06em;color:var(--g);line-height:1;margin-bottom:6px;animation:flicker 18s ease-in-out infinite;text-shadow:0 0 30px rgba(255,200,0,.15)}
+.sub-title-loc{font-family:'Noto Sans SC',sans-serif;font-size:clamp(14px,2.2vw,19px);font-weight:300;letter-spacing:.42em;color:rgba(255,200,0,.42);margin-bottom:38px}
+.sub-title-loc.kr{font-family:'Noto Sans KR',sans-serif;letter-spacing:.12em;font-size:clamp(14px,2vw,18px)}
+
+.sub-oneliner{font-size:15px;line-height:1.9;color:rgba(0,240,255,.8);font-family:'Share Tech Mono',monospace;letter-spacing:.07em;margin-bottom:48px;padding:18px 22px;border:1px solid rgba(0,240,255,.12);background:rgba(0,240,255,.02);position:relative}
+.sub-oneliner::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--c),transparent)}
+.sub-oneliner.zh-font{font-family:'Noto Sans SC',sans-serif;letter-spacing:.15em;color:rgba(0,240,255,.75)}
+.sub-oneliner.kr-font{font-family:'Noto Sans KR',sans-serif;letter-spacing:.08em;color:rgba(0,240,255,.75)}
+
+/* FORM */
+.form-wrap{border:1px solid rgba(255,200,0,.12);padding:38px 34px;background:rgba(255,200,0,.01);position:relative}
+.form-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--g2),transparent)}
+.fc{position:absolute;width:14px;height:14px;border-color:rgba(255,200,0,.32);border-style:solid}
+.fc.tl{top:0;left:0;border-width:1px 0 0 1px}
+.fc.br{bottom:0;right:0;border-width:0 1px 1px 0}
+.form-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.38em;color:rgba(0,240,255,.38);margin-bottom:26px}
+.field{margin-bottom:20px}
+.field-name{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.28em;color:rgba(255,200,0,.55);margin-bottom:8px;display:block}
+.field input,.field textarea{width:100%;background:rgba(0,0,0,.65);border:1px solid rgba(255,200,0,.14);color:#fff;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:400;padding:12px 16px;outline:none;transition:border-color .3s,box-shadow .3s;resize:none;letter-spacing:.04em}
+.field input::placeholder,.field textarea::placeholder{color:rgba(255,255,255,.2);font-size:13px}
+.field input:focus,.field textarea:focus{border-color:rgba(255,200,0,.42);box-shadow:0 0 14px rgba(255,200,0,.08),inset 0 0 14px rgba(255,200,0,.03)}
+.field textarea{height:108px;padding-top:14px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.submit-btn{margin-top:20px;width:100%;padding:14px;background:rgba(255,200,0,.06);border:1px solid rgba(255,200,0,.28);color:var(--g);font-family:'Orbitron',monospace;font-size:11px;letter-spacing:.22em;cursor:pointer;transition:all .35s;position:relative;overflow:hidden}
+.submit-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,200,0,.1),transparent);transform:translateX(-100%);transition:transform .5s}
+.submit-btn:hover::after{transform:translateX(100%)}
+.submit-btn:hover{border-color:rgba(255,200,0,.55);box-shadow:0 0 20px rgba(255,200,0,.14)}
+.submit-note{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.16em;color:rgba(255,255,255,.22);text-align:center;margin-top:12px}
+.form-success{display:none;text-align:center;padding:48px 20px}
+.success-icon{font-size:28px;color:var(--g);margin-bottom:14px;text-shadow:0 0 20px rgba(255,200,0,.5)}
+.success-en{font-family:'Orbitron',monospace;font-size:17px;font-weight:700;letter-spacing:.1em;color:var(--g);margin-bottom:8px}
+.success-sub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.18em;color:rgba(255,255,255,.35);line-height:1.8}
+.or-div{display:flex;align-items:center;gap:14px;margin:28px 0}
+.or-line{flex:1;height:1px;background:rgba(255,200,0,.07)}
+.or-txt{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.3em;color:rgba(255,200,0,.25)}
+.sub-cta{display:flex;gap:10px;flex-wrap:wrap}
+
+/* MARQUEE */
+.mq-bar{position:fixed;bottom:0;left:0;right:0;z-index:800;overflow:hidden;background:rgba(0,0,0,.92);border-top:1px solid rgba(255,200,0,.08);padding:10px 0}
+.mq-t{display:flex;white-space:nowrap;animation:mq 26s linear infinite}
+.mi{display:inline-flex;align-items:center;padding:0 24px;font-family:'Orbitron',monospace;font-size:8px;letter-spacing:.28em;color:rgba(255,200,0,.18);gap:24px}
+.ms{color:rgba(0,240,255,.2);font-size:9px}
+
+/* ══ ANIMATIONS ══ */
+@keyframes glitch1{0%,93%,100%{clip-path:inset(100% 0 0 0);transform:translate(0)}94%{clip-path:inset(5% 0 88% 0);transform:translate(-5px,0)}96%{clip-path:inset(52% 0 40% 0);transform:translate(5px,0);opacity:.8}98%{clip-path:inset(78% 0 14% 0);transform:translate(-2px,0)}}
+@keyframes glitch2{0%,95%,100%{clip-path:inset(100% 0 0 0);transform:translate(0)}96%{clip-path:inset(16% 0 76% 0);transform:translate(7px,0);opacity:.65}98%{clip-path:inset(66% 0 24% 0);transform:translate(-4px,0)}}
+@keyframes flicker{0%,88%,90%,92%,100%{opacity:1}89%{opacity:.25}91%{opacity:.75}}
+@keyframes pulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.35)}}
+@keyframes mq{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.fu{animation:fadeUp .6s ease both}
+.fi{animation:fadeIn .5s ease both}
+.d1{animation-delay:.08s}.d2{animation-delay:.16s}.d3{animation-delay:.24s}.d4{animation-delay:.32s}.d5{animation-delay:.4s}
+
+/* LANG */
+.en-t,.kr-t{display:none}
+body.en .zh,.body.en .kr-t{display:none!important}
+body.en .en-t{display:block!important}
+body.en span.en-t{display:inline!important}
+body.kr .zh,.body.kr .en-t{display:none!important}
+body.kr .kr-t{display:block!important}
+body.kr span.kr-t{display:inline!important}
+/* make sure zh shows by default */
+body:not(.en):not(.kr) .en-t,
+body:not(.en):not(.kr) .kr-t{display:none!important}
+body:not(.en):not(.kr) .zh{display:block!important}
+body:not(.en):not(.kr) span.zh{display:inline!important}
+
+/* ══ MOBILE RESPONSIVE ══ */
+@media (max-width: 768px){
+
+  /* TOPBAR */
+  .topbar{padding:12px 18px}
+  .tb-sub{display:none}
+  .tb-sep{display:none}
+  .tb-logo{font-size:11px;letter-spacing:.16em}
+  .tb-online span{display:none}
+  .tb-online{padding:5px 9px}
+  .lb{padding:5px 10px;font-size:8px}
+
+  /* HOME PAGE */
+  .page{padding:80px 20px 70px}
+  .home-sys{font-size:8px;letter-spacing:.25em;margin-bottom:20px}
+  .home-sys::before,.home-sys::after{width:16px}
+  .home-jt{font-size:clamp(38px,12vw,56px) !important;letter-spacing:.04em}
+  .home-gl,.home-gr{font-size:clamp(38px,12vw,56px) !important;letter-spacing:.04em}
+  .home-studio{font-size:clamp(14px,5vw,22px);letter-spacing:.25em}
+  .home-unlim{font-size:clamp(7px,2.2vw,10px);letter-spacing:.3em}
+  .home-div{margin:22px auto}
+  .home-tagline{font-size:12px;letter-spacing:.2em;margin-bottom:32px;padding:0 10px}
+
+  /* SERVICE TRIGGERS — stack vertically */
+  .svc-triggers{flex-direction:column;gap:2px;max-width:100%}
+  .trig{padding:22px 20px;flex-direction:row;justify-content:flex-start;gap:14px;text-align:left}
+  .trig-num{position:absolute;top:12px;right:14px;font-size:7px}
+  .trig-icon{width:32px;height:32px;flex-shrink:0}
+  .trig-icon svg{width:15px;height:15px}
+  .trig-en{font-size:9px}
+  .trig-zh,.trig-kr{font-size:11px;letter-spacing:.12em}
+  .trig-arr{margin-top:0}
+
+  /* CONTACT BUTTONS */
+  .contact-row{margin-top:28px;gap:8px}
+  .cbtn{padding:10px 16px;font-size:9px;letter-spacing:.1em}
+
+  /* SUB PAGE */
+  #sub{padding:80px 20px 60px}
+  .sub-eyebrow{font-size:8px;letter-spacing:.28em}
+  .sub-title-en{font-size:clamp(22px,8vw,38px);letter-spacing:.04em}
+  .sub-title-loc{font-size:13px;letter-spacing:.22em;margin-bottom:24px}
+  .sub-oneliner{font-size:12px;letter-spacing:.04em;padding:14px 16px;margin-bottom:32px}
+  .sub-oneliner.zh-font{font-size:13px}
+
+  /* FORM */
+  .form-wrap{padding:24px 18px}
+  .form-row{grid-template-columns:1fr}
+  .field input,.field textarea{font-size:13px;padding:10px 12px}
+  .field textarea{height:90px}
+  .submit-btn{font-size:10px;padding:13px}
+  .submit-note{font-size:8px}
+
+  /* OR DIVIDER */
+  .or-div{margin:20px 0}
+  .sub-cta{gap:8px}
+
+  /* MARQUEE */
+  .mq-bar{padding:8px 0}
+  .mi{font-size:7px;letter-spacing:.18em;padding:0 16px;gap:16px}
+}
+
+@media (max-width: 400px){
+  .home-jt{font-size:34px !important}
+  .home-gl,.home-gr{font-size:34px !important}
+  .home-studio{font-size:13px;letter-spacing:.18em}
+  .topbar{padding:10px 14px}
+  .lb{padding:4px 8px;font-size:8px}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="vig"></div>
+
+
+
+
+<!-- ══ TOPBAR ══ -->
+<div class="topbar">
+  <div class="tb-left">
+    <button class="back-btn" id="backBtn" onclick="goHome()">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      <span class="zh">返回</span><span class="en-t">BACK</span><span class="kr-t">뒤로</span>
+    </button>
+    <div class="tb-logo" onclick="goHome()">JT STUDIO</div>
+    <div class="tb-sep"></div>
+    <div class="tb-sub">UNLIMITED</div>
+  </div>
+
+  <div class="tb-right">
+    <div class="tb-online">
+      <span class="sdot"></span>
+      <span>ONLINE</span>
+    </div>
+    <div class="lang-sw">
+      <button class="lb on" id="lz" onclick="setL('zh')">中文</button>
+      <button class="lb" id="le" onclick="setL('en')">EN</button>
+      <button class="lb lb-kr" id="lk" onclick="setL('kr')">한국어</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HOME ══ -->
+<div class="page active" id="home">
+
+  <div class="home-sys fu">SYS://JT_STUDIO · AUTHENTICATED</div>
+
+  <div class="name-wrap fu d1">
+    <span class="home-gl" aria-hidden="true">JT STUDIO</span>
+    <span class="home-gr" aria-hidden="true">JT STUDIO</span>
+    <span class="home-jt">JT STUDIO</span>
+    <span class="home-studio">UNLIMITED</span>
+    <span class="home-unlim">EST. SEOUL · KR &amp; CN</span>
+  </div>
+
+  <div class="home-div fu d2">
+    <div class="hdl"></div><div class="hdd"></div><div class="hdlr hdl"></div>
+  </div>
+
+  <div class="home-tagline fu d2">
+    <span class="zh">无论你需要什么，这里都是起点</span>
+    <span class="en-t">Whatever you need — this is where it starts</span>
+    <span class="kr-t">무엇이 필요하든, 여기서 시작됩니다</span>
+  </div>
+
+  <div class="svc-triggers fu d3">
+    <div class="trig" onclick="goSub(0)">
+      <div class="trig-num">01</div>
+      <div class="trig-icon"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4m-2-2v4M15 11h.01M17 13h.01"/></svg></div>
+      <div class="trig-en">KOREAN GAMING</div>
+      <div class="trig-zh zh">韩服游戏全生态</div>
+      <div class="trig-kr en-t">Full KR Gaming Ecosystem</div>
+      <div class="trig-kr kr-t">한국 게임 풀 에코시스템</div>
+      <div class="trig-arr"><div class="trig-aline"></div>
+        <span class="zh">进入</span><span class="en-t">ENTER</span><span class="kr-t">입장</span>
+      </div>
+    </div>
+    <div class="trig" onclick="goSub(1)">
+      <div class="trig-num">02</div>
+      <div class="trig-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+      <div class="trig-en">TECH &amp; DESIGN</div>
+      <div class="trig-zh zh">线上顶级技术支持</div>
+      <div class="trig-kr en-t">Elite Online Tech Support</div>
+      <div class="trig-kr kr-t">최고급 기술 & 디자인 지원</div>
+      <div class="trig-arr"><div class="trig-aline"></div>
+        <span class="zh">进入</span><span class="en-t">ENTER</span><span class="kr-t">입장</span>
+      </div>
+    </div>
+    <div class="trig" onclick="goSub(2)">
+      <div class="trig-num">03</div>
+      <div class="trig-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+      <div class="trig-en">KR-CN ADVISORY</div>
+      <div class="trig-zh zh">中韩跨境咨询合作</div>
+      <div class="trig-kr en-t">KR-CN Cross-border Advisory</div>
+      <div class="trig-kr kr-t">한중 크로스보더 컨설팅</div>
+      <div class="trig-arr"><div class="trig-aline"></div>
+        <span class="zh">进入</span><span class="en-t">ENTER</span><span class="kr-t">입장</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="contact-row fu d4">
+    <a href="https://t.me/Jason_Atticverse" class="cbtn btn-tg" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M21.198 2.433a2.242 2.242 0 0 0-1.022.215l-16.5 7.5a2.25 2.25 0 0 0 .126 4.073l3.9 1.205 2.306 6.52a.75.75 0 0 0 1.31.233l2.362-2.922 4.532 3.399a2.25 2.25 0 0 0 3.522-1.566l2.062-17.25a2.25 2.25 0 0 0-2.598-2.407z"/></svg>
+      Telegram
+    </a>
+    <a href="mailto:jasonforthegoods@gmail.com" class="cbtn btn-mail">
+      <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      Email
+    </a>
+  </div>
+</div>
+
+<!-- ══ SUB PAGE ══ -->
+<div class="page" id="sub">
+  <div class="sub-inner">
+
+    <div class="sub-eyebrow fi" id="sub-eyebrow">PILLAR · 01</div>
+    <div class="sub-title-en fu" id="sub-title-en">KOREAN GAMING</div>
+    <div class="sub-title-loc fu d1" id="sub-title-loc">韩服游戏全生态</div>
+
+    <div class="sub-oneliner fu d2 zh-font" id="sub-oneliner">
+      有任何韩服相关的问题，直接来聊。
+    </div>
+
+    <div class="form-wrap fu d3">
+      <div class="fc tl"></div><div class="fc br"></div>
+      <div class="form-label">// SUBMIT INQUIRY</div>
+
+      <div id="formArea">
+        <div class="field">
+          <span class="field-name zh">咨询标题</span>
+          <span class="field-name en-t">SUBJECT</span>
+          <span class="field-name kr-t">문의 제목</span>
+          <input type="text" id="f-subject" placeholder="简短描述你的需求 / Brief description / 간단한 문의 제목" maxlength="80">
+        </div>
+        <div class="field">
+          <span class="field-name zh">咨询内容</span>
+          <span class="field-name en-t">MESSAGE</span>
+          <span class="field-name kr-t">문의 내용</span>
+          <textarea id="f-message" placeholder="详细说明你的情况或问题 / Describe in detail / 자세히 설명해 주세요"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="field" style="margin-bottom:0">
+            <span class="field-name zh">联系方式</span>
+            <span class="field-name en-t">CONTACT</span>
+            <span class="field-name kr-t">연락처</span>
+            <input type="text" id="f-contact" placeholder="Telegram / Email / 微信 / 카카오">
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <span class="field-name zh">称呼（选填）</span>
+            <span class="field-name en-t">NAME (OPTIONAL)</span>
+            <span class="field-name kr-t">이름 (선택)</span>
+            <input type="text" id="f-name" placeholder="你的名字 / Name / 이름">
+          </div>
+        </div>
+        <button class="submit-btn" onclick="submitForm()">
+          <span class="zh">提交咨询</span>
+          <span class="en-t">SUBMIT INQUIRY</span>
+          <span class="kr-t">문의 제출</span>
+        </button>
+        <div class="submit-note">
+          <span class="zh">提交后我们会通过你留下的联系方式与你取得联系</span>
+          <span class="en-t">We'll reach out via the contact info you provide</span>
+          <span class="kr-t">입력하신 연락처로 연락드리겠습니다</span>
+        </div>
+      </div>
+
+      <div class="form-success" id="formSuccess">
+        <div class="success-icon">◈</div>
+        <div class="success-en">
+          <span class="zh">已收到你的咨询</span>
+          <span class="en-t">INQUIRY RECEIVED</span>
+          <span class="kr-t">문의가 접수되었습니다</span>
+        </div>
+        <div class="success-sub">
+          <span class="zh">我们会尽快通过你留下的联系方式回复你</span>
+          <span class="en-t">We'll reach out via your provided contact shortly</span>
+          <span class="kr-t">빠른 시일 내에 연락드리겠습니다</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="or-div fu d4">
+      <div class="or-line"></div>
+      <div class="or-txt"><span class="zh">或者直接联系</span><span class="en-t">OR REACH OUT DIRECTLY</span><span class="kr-t">직접 연락하기</span></div>
+      <div class="or-line"></div>
+    </div>
+
+    <div class="sub-cta fu d4">
+      <a href="https://t.me/Jason_Atticverse" class="cbtn btn-tg" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M21.198 2.433a2.242 2.242 0 0 0-1.022.215l-16.5 7.5a2.25 2.25 0 0 0 .126 4.073l3.9 1.205 2.306 6.52a.75.75 0 0 0 1.31.233l2.362-2.922 4.532 3.399a2.25 2.25 0 0 0 3.522-1.566l2.062-17.25a2.25 2.25 0 0 0-2.598-2.407z"/></svg>
+        <span class="zh">Telegram 咨询</span><span class="en-t">Contact via Telegram</span><span class="kr-t">텔레그램 문의</span>
+      </a>
+      <a href="mailto:jasonforthegoods@gmail.com" class="cbtn btn-mail">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <span class="zh">Email 咨询</span><span class="en-t">Contact via Email</span><span class="kr-t">이메일 문의</span>
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<!-- MARQUEE -->
+<div class="mq-bar">
+  <div class="mq-t">
+    <div class="mi">JT STUDIO UNLIMITED<span class="ms">◆</span></div>
+    <div class="mi">韩服游戏全生态<span class="ms">◆</span></div>
+    <div class="mi">한국 게임 풀 에코시스템<span class="ms">◆</span></div>
+    <div class="mi">TECH &amp; DESIGN<span class="ms">◆</span></div>
+    <div class="mi">线上顶级技术支持<span class="ms">◆</span></div>
+    <div class="mi">KR-CN ADVISORY<span class="ms">◆</span></div>
+    <div class="mi">중한 크로스보더 컨설팅<span class="ms">◆</span></div>
+    <div class="mi">WHATEVER YOU NEED<span class="ms">◆</span></div>
+    <div class="mi">这里都是起点<span class="ms">◆</span></div>
+    <div class="mi">무엇이든 여기서 시작<span class="ms">◆</span></div>
+    <div class="mi">JT STUDIO UNLIMITED<span class="ms">◆</span></div>
+    <div class="mi">韩服游戏全生态<span class="ms">◆</span></div>
+    <div class="mi">한국 게임 풀 에코시스템<span class="ms">◆</span></div>
+    <div class="mi">TECH &amp; DESIGN<span class="ms">◆</span></div>
+    <div class="mi">线上顶级技术支持<span class="ms">◆</span></div>
+    <div class="mi">KR-CN ADVISORY<span class="ms">◆</span></div>
+    <div class="mi">중한 크로스보더 컨설팅<span class="ms">◆</span></div>
+    <div class="mi">WHATEVER YOU NEED<span class="ms">◆</span></div>
+    <div class="mi">这里都是起点<span class="ms">◆</span></div>
+    <div class="mi">무엇이든 여기서 시작<span class="ms">◆</span></div>
+  </div>
+</div>
+
+<script>
+/* ═══ CANVAS ═══ */
+const cvs=document.getElementById('bg'),ctx=cvs.getContext('2d');
+let W,H;
+function rsz(){W=cvs.width=window.innerWidth;H=cvs.height=window.innerHeight}
+rsz();window.addEventListener('resize',rsz);
+const FSZ=13,cols=Math.ceil(2000/FSZ);
+const drops=Array.from({length:cols},()=>Math.random()*-100);
+const JP='アイウエオカキクケコサシスセソタチツテトハヒフヘホマミムメモヤユヨラリルレロ';
+const CHARS=(JP+'0123456789ABCDEF').split('');
+const PTS=[];
+for(let i=0;i<65;i++)PTS.push({x:Math.random()*1600,y:Math.random()*900,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*.65+.2,a:Math.random()*.35+.06,da:(Math.random()-.5)*.002,gold:Math.random()>.6});
+const STARS=[];
+function addStar(){if(STARS.length<4)STARS.push({x:Math.random()*W,y:0,vx:(Math.random()-.5)*1.8,vy:Math.random()*2.2+.8,life:80,maxLife:80+Math.random()*60,gold:Math.random()>.45})}
+setInterval(addStar,2400);
+let fr=0;
+function draw(){
+  fr++;
+  ctx.fillStyle='rgba(0,0,0,0.055)';ctx.fillRect(0,0,W,H);
+  if(fr%5===0){ctx.strokeStyle='rgba(255,200,0,0.011)';ctx.lineWidth=.5;for(let x=0;x<W;x+=72){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=0;y<H;y+=72){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}}
+  ctx.font=`${FSZ}px 'Share Tech Mono',monospace`;
+  drops.forEach((d,i)=>{if(i*FSZ>W)return;const ch=CHARS[Math.floor(Math.random()*CHARS.length)];ctx.fillStyle=Math.random()>.97?'rgba(255,248,160,.82)':`rgba(255,200,0,${Math.random()*.13+.02})`;ctx.fillText(ch,i*FSZ,d*FSZ);if(d*FSZ>H&&Math.random()>.978)drops[i]=0;drops[i]+=.42;});
+  PTS.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=p.da;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;if(p.a<.04)p.da=Math.abs(p.da);if(p.a>.42)p.da=-Math.abs(p.da);ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.gold?`rgba(255,200,0,${p.a})`:`rgba(0,240,255,${p.a*.45})`;ctx.fill();});
+  for(let i=0;i<PTS.length;i++)for(let j=i+1;j<PTS.length;j++){const dx=PTS[i].x-PTS[j].x,dy=PTS[i].y-PTS[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<90){ctx.beginPath();ctx.moveTo(PTS[i].x,PTS[i].y);ctx.lineTo(PTS[j].x,PTS[j].y);const a=(1-d/90)*.04;ctx.strokeStyle=PTS[i].gold||PTS[j].gold?`rgba(255,200,0,${a})`:`rgba(0,240,255,${a*.5})`;ctx.lineWidth=.4;ctx.stroke();}}
+  for(let i=STARS.length-1;i>=0;i--){const s=STARS[i];s.x+=s.vx;s.y+=s.vy;s.life--;const a=Math.min(s.life/s.maxLife,1-(s.maxLife-s.life)/s.maxLife)*2.2;if(a>0){ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(s.x-s.vx*12,s.y-s.vy*12);ctx.strokeStyle=s.gold?`rgba(255,200,0,${Math.min(a,.6)})`:`rgba(0,240,255,${Math.min(a,.4)})`;ctx.lineWidth=.7;ctx.stroke()}if(s.life<=0||s.y>H)STARS.splice(i,1);}
+  requestAnimationFrame(draw);
+}
+draw();
+
+/* ═══ SUB DATA ═══ */
+const SUBS=[
+  {eyebrow:'PILLAR · 01',en:'KOREAN GAMING',
+   zh:'韩服游戏全生态',kr:'한국 게임 풀 에코시스템',
+   ol_zh:'有任何韩服相关的问题，直接来聊。',
+   ol_en:'Any question about KR gaming — just reach out.',
+   ol_kr:'한국 게임 관련 문의는 언제든지 연락 주세요.'},
+  {eyebrow:'PILLAR · 02',en:'TECH & DESIGN',
+   zh:'线上顶级技术支持',kr:'최고급 기술 & 디자인 지원',
+   ol_zh:'你有想法，我们让它成真。',
+   ol_en:'You have the vision. We make it real.',
+   ol_kr:'아이디어가 있다면, 우리가 현실로 만들겠습니다.'},
+  {eyebrow:'PILLAR · 03',en:'KR-CN ADVISORY',
+   zh:'中韩跨境咨询合作',kr:'한중 크로스보더 컨설팅',
+   ol_zh:'跨境不是麻烦，是被低估的机会。',
+   ol_en:"Cross-border isn't a problem. It's an underrated opportunity.",
+   ol_kr:'크로스보더는 문제가 아닌, 저평가된 기회입니다.'}
+];
+let curSub=0;
+
+function goSub(idx){
+  curSub=idx;
+  const s=SUBS[idx];
+  const lang=curLang();
+  document.getElementById('sub-eyebrow').textContent=s.eyebrow;
+  document.getElementById('sub-title-en').textContent=s.en;
+  const loc=document.getElementById('sub-title-loc');
+  loc.textContent=lang==='kr'?s.kr:s.zh;
+  loc.className='sub-title-loc fu d1'+(lang==='kr'?' kr':'');
+  setOneliner(lang);
+  document.getElementById('formArea').style.display='block';
+  document.getElementById('formSuccess').style.display='none';
+  ['f-subject','f-message','f-contact','f-name'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('home').classList.remove('active');
+  document.getElementById('sub').classList.add('active');
+  document.getElementById('backBtn').style.display='flex';
+  window.scrollTo(0,0);
+  document.querySelectorAll('#sub .fu,#sub .fi').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});
+}
+
+function setOneliner(lang){
+  const s=SUBS[curSub];
+  const ol=document.getElementById('sub-oneliner');
+  if(lang==='en'){ol.textContent=s.ol_en;ol.className='sub-oneliner fu d2';}
+  else if(lang==='kr'){ol.textContent=s.ol_kr;ol.className='sub-oneliner fu d2 kr-font';}
+  else{ol.textContent=s.ol_zh;ol.className='sub-oneliner fu d2 zh-font';}
+}
+
+function goHome(){
+  document.getElementById('sub').classList.remove('active');
+  document.getElementById('home').classList.add('active');
+  document.getElementById('backBtn').style.display='none';
+  window.scrollTo(0,0);
+}
+
+function submitForm(){
+  const subj=document.getElementById('f-subject').value.trim();
+  const cont=document.getElementById('f-contact').value.trim();
+  const lang=curLang();
+  if(!subj||!cont){
+    const msgs={zh:'请填写咨询标题和联系方式。',en:'Please fill in Subject and Contact.',kr:'제목과 연락처를 입력해 주세요.'};
+    alert(msgs[lang]);return;
+  }
+  document.getElementById('formArea').style.display='none';
+  document.getElementById('formSuccess').style.display='block';
+}
+
+/* ═══ LANG SWITCH — simple + JT FORMAT EFFECT ═══ */
+function curLang(){return document.body.classList.contains('en')?'en':document.body.classList.contains('kr')?'kr':'zh'}
+
+function setL(l){
+  if(curLang()===l)return;
+  document.body.classList.remove('en','kr');
+  if(l==='en')document.body.classList.add('en');
+  if(l==='kr')document.body.classList.add('kr');
+  document.getElementById('lz').classList.toggle('on',l==='zh');
+  document.getElementById('le').classList.toggle('on',l==='en');
+  document.getElementById('lk').classList.toggle('on',l==='kr');
+  if(document.getElementById('sub').classList.contains('active')){
+    const s=SUBS[curSub];
+    const loc=document.getElementById('sub-title-loc');
+    loc.textContent=l==='kr'?s.kr:s.zh;
+    loc.className='sub-title-loc fu d1'+(l==='kr'?' kr':'');
+    setOneliner(l);
+  }
+  formatBrand();
+}
+
+/* ═══ JT STUDIO FORMAT / BOOT EFFECT ═══ */
+/* Runs on page load and whenever called */
+const BRAND_CHARS = 'JT STUDIO';
+const CHAR_POOL   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@$%&!?';
+
+function formatBrand(){
+  const el = document.querySelector('.home-jt');
+  if(!el) return;
+
+  let frame = 0;
+  const TOTAL_FRAMES = 38; // total scramble frames
+  const SETTLE_START = 18; // frame at which chars start locking in L→R
+
+  // each char settles at staggered frames
+  const settleAt = BRAND_CHARS.split('').map((_,i) =>
+    SETTLE_START + Math.floor(i * (TOTAL_FRAMES - SETTLE_START) / BRAND_CHARS.length)
+  );
+
+  if(el._formatRaf) cancelAnimationFrame(el._formatRaf);
+
+  function tick(){
+    frame++;
+    let out = '';
+    for(let i=0;i<BRAND_CHARS.length;i++){
+      if(BRAND_CHARS[i]===' '){out+=' ';continue;}
+      if(frame >= settleAt[i]){
+        out += BRAND_CHARS[i]; // locked in
+      } else {
+        // scrambling — faster randomization early
+        out += CHAR_POOL[Math.floor(Math.random()*CHAR_POOL.length)];
+      }
+    }
+    el.textContent = out;
+    // also update glitch layers
+    const gl = document.querySelector('.home-gl');
+    const gr = document.querySelector('.home-gr');
+    if(gl) gl.textContent = out;
+    if(gr) gr.textContent = out;
+
+    if(frame < TOTAL_FRAMES){
+      el._formatRaf = requestAnimationFrame(tick);
+    } else {
+      el.textContent = BRAND_CHARS;
+      if(gl) gl.textContent = BRAND_CHARS;
+      if(gr) gr.textContent = BRAND_CHARS;
+    }
+  }
+  el._formatRaf = requestAnimationFrame(tick);
+}
+
+// Run on load
+window.addEventListener('load', () => setTimeout(formatBrand, 400));
+
+// Also run on hover for fun
+const jtEl = document.querySelector('.home-jt');
+if(jtEl){
+  jtEl.addEventListener('mouseenter', formatBrand);
+}
+</script>
+</body>
+</html>
